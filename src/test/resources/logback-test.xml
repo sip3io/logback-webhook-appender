@@ -1,0 +1,15 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<configuration>
+    <appender name="webhook" class="io.sip3.logback.WebhookAppender">
+        <url>http://127.0.0.1:8080/webhook</url>
+        <json>
+            {
+                "message" : "{event}"
+            }
+        </json>
+    </appender>
+
+    <root level="DEBUG">
+        <appender-ref ref="webhook" />
+    </root>
+</configuration>
