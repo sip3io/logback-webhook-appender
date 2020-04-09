@@ -43,7 +43,7 @@ class WebhookAppenderTest {
     fun `Verify webhook call`() {
         logger.info("Hello, World!")
 
-        val json = server.takeRequest(5000, TimeUnit.SECONDS)
+        val json = server.takeRequest(5, TimeUnit.SECONDS)
                 ?.body
                 ?.readString(Charset.defaultCharset())
 

@@ -4,9 +4,12 @@
         <url>http://127.0.0.1:8080/webhook</url>
         <json>
             {
-                "message" : "{event}"
+                "message" : "{message}"
             }
         </json>
+        <encoder>
+            <pattern>%msg</pattern>
+        </encoder>
     </appender>
 
     <root level="DEBUG">

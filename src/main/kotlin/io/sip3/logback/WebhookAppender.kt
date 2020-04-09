@@ -18,6 +18,7 @@ package io.sip3.logback
 
 import ch.qos.logback.classic.spi.ILoggingEvent
 import ch.qos.logback.core.UnsynchronizedAppenderBase
+import ch.qos.logback.core.encoder.Encoder
 import okhttp3.*
 import okhttp3.MediaType.Companion.toMediaType
 import okhttp3.RequestBody.Companion.toRequestBody
@@ -37,14 +38,18 @@ class WebhookAppender : UnsynchronizedAppenderBase<ILoggingEvent>() {
         val MEDIA_TYPE_JSON = "application/json; charset=utf-8".toMediaType()
     }
 
+    lateinit var encoder: Encoder<ILoggingEvent>
+
     lateinit var url: String
     lateinit var json: String
 
     private val client: OkHttpClient by lazy { OkHttpClient() }
 
     override fun append(event: ILoggingEvent) {
+        val message = String(encoder.encode(event))
+
         // Replace JSON variables
-        val payload = json.replace("{event}", event.toString())
+        val payload = json.replace("{message}", message)
 
         // Create HTTP POST request
         val request = Request.Builder()
