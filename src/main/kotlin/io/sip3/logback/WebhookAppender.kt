@@ -24,10 +24,11 @@ import okhttp3.MediaType.Companion.toMediaType
 import okhttp3.RequestBody.Companion.toRequestBody
 import org.slf4j.LoggerFactory
 import java.io.IOException
+import kotlin.properties.Delegates.observable
 
 /**
  * Calls configured webhook on every logging event.
- * Important: Designed to be used for WARNING and ERROR events only.
+ * Important: Designed to be used for matching, WARNING or ERROR events only.
  */
 class WebhookAppender : UnsynchronizedAppenderBase<ILoggingEvent>() {
 
@@ -36,6 +37,8 @@ class WebhookAppender : UnsynchronizedAppenderBase<ILoggingEvent>() {
     companion object {
 
         val MEDIA_TYPE_JSON = "application/json; charset=utf-8".toMediaType()
+
+        const val REGEX_ANY = ".*"
     }
 
     lateinit var encoder: Encoder<ILoggingEvent>
@@ -43,11 +46,24 @@ class WebhookAppender : UnsynchronizedAppenderBase<ILoggingEvent>() {
     lateinit var url: String
     lateinit var json: String
 
+    private var regex: Regex = Regex(REGEX_ANY)
+    var pattern: String by observable(REGEX_ANY) { _, _, v ->
+        regex = Regex(v)
+    }
+
     private val client: OkHttpClient by lazy { OkHttpClient() }
 
     override fun append(event: ILoggingEvent) {
+        // Encode message
         val message = String(encoder.encode(event))
 
+        // Check if message matches configured pattern
+        if (message.matches(regex)) {
+            send(message)
+        }
+    }
+
+    private fun send(message: String) {
         // Replace JSON variables
         val payload = json.replace("{message}", message)
 

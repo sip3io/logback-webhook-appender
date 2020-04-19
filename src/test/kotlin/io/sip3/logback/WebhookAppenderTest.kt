@@ -41,6 +41,7 @@ class WebhookAppenderTest {
 
     @Test
     fun `Verify webhook call`() {
+        logger.info("Aloha, World!")
         logger.info("Hello, World!")
 
         val json = server.takeRequest(5, TimeUnit.SECONDS)

@@ -7,6 +7,7 @@
                 "message" : "{message}"
             }
         </json>
+        <pattern>Hello.*</pattern>
         <encoder>
             <pattern>%msg</pattern>
         </encoder>
