@@ -34,22 +34,15 @@ class WebhookAppender : UnsynchronizedAppenderBase<ILoggingEvent>() {
 
     private val logger = LoggerFactory.getLogger(WebhookAppender::class.java)
 
-    companion object {
-
-        val MEDIA_TYPE_JSON = "application/json; charset=utf-8".toMediaType()
-
-        const val REGEX_ANY = ".*"
-    }
-
     lateinit var encoder: Encoder<ILoggingEvent>
 
     lateinit var url: String
     lateinit var json: String
 
-    private var regex: Regex = Regex(REGEX_ANY)
-    var pattern: String by observable(REGEX_ANY) { _, _, v ->
-        regex = Regex(v)
+    var pattern: String by observable(".*") { _, _, v ->
+        regex = Regex(v, RegexOption.DOT_MATCHES_ALL)
     }
+    private var regex: Regex = Regex(pattern, RegexOption.DOT_MATCHES_ALL)
 
     private val client: OkHttpClient by lazy { OkHttpClient() }
 
@@ -70,7 +63,7 @@ class WebhookAppender : UnsynchronizedAppenderBase<ILoggingEvent>() {
         // Create HTTP POST request
         val request = Request.Builder()
                 .url(url)
-                .post(payload.toRequestBody(MEDIA_TYPE_JSON))
+                .post(payload.toRequestBody("application/json; charset=utf-8".toMediaType()))
                 .build()
 
         // Execute HTTP POST request
