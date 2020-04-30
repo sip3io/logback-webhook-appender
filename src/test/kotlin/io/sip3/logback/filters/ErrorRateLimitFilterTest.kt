@@ -25,17 +25,17 @@ import org.junit.Test
 import ch.qos.logback.classic.Logger
 import org.slf4j.LoggerFactory
 
-class RateLimitFilterTest {
+class ErrorRateLimitFilterTest {
 
     private lateinit var appender: ListAppender<ILoggingEvent>
-    private val logger = LoggerFactory.getLogger(RateLimitFilterTest::class.java) as Logger
+    private val logger = LoggerFactory.getLogger(ErrorRateLimitFilterTest::class.java) as Logger
 
     @Before
     fun `Add appender`() {
         appender = ListAppender();
-        val rateLimitFilter = RateLimitFilter().apply {
+        val rateLimitFilter = ErrorRateLimitFilter().apply {
             maxSize = 2
-            period =1
+            periodInSeconds = 1
         }
         appender.addFilter(rateLimitFilter)
         appender.start();

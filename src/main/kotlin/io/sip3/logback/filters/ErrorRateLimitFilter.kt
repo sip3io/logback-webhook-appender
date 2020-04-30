@@ -17,27 +17,31 @@
 package io.sip3.logback.filters
 
 import ch.qos.logback.classic.spi.ILoggingEvent
+import ch.qos.logback.classic.spi.IThrowableProxy
 import ch.qos.logback.core.filter.Filter
 import ch.qos.logback.core.spi.FilterReply
 import org.apache.commons.collections4.map.PassiveExpiringMap
 
 /**
- * Limit rate of logging events to 1 event in `period` seconds.
+ * Limit rate of logging events to 1 event in `periodInSeconds`.
  * After cache size reaches `maxSize` all events will be filtered.
- * Event hash based on first line of StackTrace or `loggerName` and `message`
+ * Event hash is based on first line of StackTrace. An event without throwableProxy is not filtered.
  */
-class RateLimitFilter : Filter<ILoggingEvent>() {
+class ErrorRateLimitFilter : Filter<ILoggingEvent>() {
 
     private val cache: PassiveExpiringMap<Int, Long> by lazy {
-        PassiveExpiringMap<Int, Long>(period * 1000L)
+        PassiveExpiringMap<Int, Long>(periodInSeconds * 1000L)
     }
 
-    private val prime = 31
     var maxSize = 100
-    var period = 60
+    var periodInSeconds = 60
 
     override fun decide(event: ILoggingEvent): FilterReply {
-        val hash = computeHash(event)
+        if (event.throwableProxy == null) {
+            return FilterReply.NEUTRAL
+        }
+
+        val hash = computeHash(event.throwableProxy)
         if (cache.containsKey(hash) || cache.size >= maxSize) {
             return FilterReply.DENY
         } else {
@@ -46,21 +50,10 @@ class RateLimitFilter : Filter<ILoggingEvent>() {
         }
     }
 
-    private fun computeHash(event: ILoggingEvent): Int {
-        var result = 1
-
-        // If event contains stacktrace get first line from it
-        event.throwableProxy
-                ?.stackTraceElementProxyArray
-                ?.firstOrNull { stackTraceElementProxy ->
-                    result = result * prime + stackTraceElementProxy.steAsString.hashCode()
-                    return result
-                }
-
-        // Otherwise compute hash from loggerName and message
-        result = result * prime + event.loggerName.hashCode()
-        result = result * prime + event.message.hashCode()
-
-        return result
+    private fun computeHash(throwableProxy: IThrowableProxy): Int {
+        return throwableProxy.stackTraceElementProxyArray
+                .first()
+                .steAsString
+                .hashCode()
     }
 }
