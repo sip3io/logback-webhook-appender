@@ -23,9 +23,9 @@ import ch.qos.logback.core.spi.FilterReply
 import org.apache.commons.collections4.map.PassiveExpiringMap
 
 /**
- * Limit rate of logging events to 1 event in `periodInSeconds`.
+ * Limits the rate of logging events. One event will be sent in `periodInSeconds`.
  * After cache size reaches `maxSize` all events will be filtered.
- * Event hash is based on first line of StackTrace. An event without throwableProxy is not filtered.
+ * Event hash is based on the first line of the stack trace. An event without `throwableProxy` is not filtered.
  */
 class ErrorRateLimitFilter : Filter<ILoggingEvent>() {
 

@@ -33,7 +33,7 @@
             <version>${okhttp.version}</version>
         </dependency>
 
-        <!-- Apache commons -->
+        <!-- Utils -->
         <dependency>
             <groupId>org.apache.commons</groupId>
             <artifactId>commons-collections4</artifactId>
