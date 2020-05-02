@@ -35,14 +35,15 @@ class WebhookAppenderTest {
     @Before
     fun `Configure mock server`() {
         server = MockWebServer()
-        server.start(8080)
+        server.start(34343)
         server.url("/webhook")
     }
 
     @Test
     fun `Verify webhook call`() {
         logger.info("Aloha, World!")
-        logger.info("Hello, World!")
+        logger.info("Hello, %username%!")
+        logger.error("Hello, World!")
 
         val json = server.takeRequest(5, TimeUnit.SECONDS)
                 ?.body
