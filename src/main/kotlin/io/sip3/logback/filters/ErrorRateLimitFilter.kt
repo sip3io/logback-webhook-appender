@@ -16,8 +16,8 @@
 
 package io.sip3.logback.filters
 
+import ch.qos.logback.classic.Level
 import ch.qos.logback.classic.spi.ILoggingEvent
-import ch.qos.logback.classic.spi.IThrowableProxy
 import ch.qos.logback.core.filter.Filter
 import ch.qos.logback.core.spi.FilterReply
 import org.apache.commons.collections4.map.PassiveExpiringMap
@@ -29,31 +29,29 @@ import org.apache.commons.collections4.map.PassiveExpiringMap
  */
 class ErrorRateLimitFilter : Filter<ILoggingEvent>() {
 
-    private val cache: PassiveExpiringMap<Int, Long> by lazy {
-        PassiveExpiringMap<Int, Long>(periodInSeconds * 1000L)
+    private val cache: PassiveExpiringMap<String, Long> by lazy {
+        PassiveExpiringMap<String, Long>(periodInSeconds * 1000L)
     }
 
     var maxSize = 100
     var periodInSeconds = 60
 
     override fun decide(event: ILoggingEvent): FilterReply {
-        if (event.throwableProxy == null) {
-            return FilterReply.NEUTRAL
-        }
-
-        val hash = computeHash(event.throwableProxy)
-        if (cache.containsKey(hash) || cache.size >= maxSize) {
+        if (event.level != Level.ERROR) {
             return FilterReply.DENY
-        } else {
-            cache[hash] = event.timeStamp
-            return FilterReply.NEUTRAL
         }
-    }
 
-    private fun computeHash(throwableProxy: IThrowableProxy): Int {
-        return throwableProxy.stackTraceElementProxyArray
-                .first()
-                .steAsString
-                .hashCode()
+        event.throwableProxy
+                ?.stackTraceElementProxyArray
+                ?.first()
+                ?.steAsString
+                ?.let { errorLine ->
+                    if (cache.size >= maxSize || cache.containsKey(errorLine)) {
+                        return FilterReply.DENY
+                    }
+                    cache[errorLine] = event.timeStamp
+                }
+
+        return FilterReply.NEUTRAL
     }
 }
