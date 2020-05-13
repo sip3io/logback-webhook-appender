@@ -43,14 +43,14 @@ class WebhookAppenderTest {
     fun `Verify webhook call`() {
         logger.info("Aloha, World!")
         logger.info("Hello, %username%!")
-        logger.error("Hello, World!")
+        logger.error("Hello, World:\n {\"name\": \"some string value in json\"}")
 
         val json = server.takeRequest(5, TimeUnit.SECONDS)
                 ?.body
                 ?.readString(Charset.defaultCharset())
 
         assertNotNull(json)
-        assertTrue(json!!.contains("Hello, World!"))
+        assertTrue(json!!.contains("\\\"some string value in json\\\""))
     }
 
     @After
