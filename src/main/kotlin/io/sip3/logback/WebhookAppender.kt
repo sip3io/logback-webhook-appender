@@ -22,6 +22,7 @@ import ch.qos.logback.core.encoder.Encoder
 import okhttp3.*
 import okhttp3.MediaType.Companion.toMediaType
 import okhttp3.RequestBody.Companion.toRequestBody
+import org.apache.commons.text.StringEscapeUtils
 import org.slf4j.LoggerFactory
 import java.io.IOException
 import kotlin.properties.Delegates.observable
@@ -58,7 +59,7 @@ class WebhookAppender : UnsynchronizedAppenderBase<ILoggingEvent>() {
 
     private fun send(message: String) {
         // Replace JSON variables
-        val payload = json.replace("{message}", message)
+        val payload = json.replace("{message}", StringEscapeUtils.escapeJson(message))
 
         // Create HTTP POST request
         val request = Request.Builder()

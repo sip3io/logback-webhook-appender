@@ -30,11 +30,12 @@ import org.apache.commons.collections4.map.PassiveExpiringMap
 class ErrorRateLimitFilter : Filter<ILoggingEvent>() {
 
     private val cache: PassiveExpiringMap<String, Long> by lazy {
-        PassiveExpiringMap<String, Long>(periodInSeconds * 1000L)
+        PassiveExpiringMap<String, Long>((periodInSeconds ?: (periodInMinutes * 60)) * 1000L)
     }
 
     var maxSize = 100
-    var periodInSeconds = 60
+    var periodInSeconds: Int? = null
+    var periodInMinutes = 1
 
     override fun decide(event: ILoggingEvent): FilterReply {
         if (event.level != Level.ERROR) {

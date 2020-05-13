@@ -3,7 +3,7 @@
     <appender name="webhook" class="io.sip3.logback.WebhookAppender">
         <filter class="io.sip3.logback.filters.ErrorRateLimitFilter">
             <maxSize>100</maxSize>
-            <periodInSeconds>60</periodInSeconds>
+            <periodInMinutes>1</periodInMinutes>
         </filter>
         <url>http://127.0.0.1:34343/webhook</url>
         <json>
