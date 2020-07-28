@@ -67,23 +67,19 @@ pipeline {
             }
         }
 
-        stage('Branch') {
+        stage('Deploy') {
             steps {
-                // Create release branch
-                sh "git checkout -b ${releaseBranch}"
-                sh "git commit -a -m \"New release ${releaseVersion}\""
-                sh "git push https://${GITHUB_TOKEN}:x-oauth-basic@github.com/sip3io/logback-webhook-appender.git ${releaseBranch}"
+                // Deploy to internal artifactory
+                sh 'mvn deploy -DskipTests=true -DaltDeploymentRepository=sip3-releases-ce::default::${SIP3_MAVEN_REPO_URI}/releases-ce'
             }
         }
 
         stage('Release') {
             steps {
-                // Add tag
-                sh "git tag ${releaseVersion}"
-                sh "git push https://${GITHUB_TOKEN}:x-oauth-basic@github.com/sip3io/logback-webhook-appender.git --tags"
-
-                // Deploy to internal artifactory
-                sh 'mvn deploy -DskipTests=true -DaltDeploymentRepository=asip3-releases-ce::default::${SIP3_MAVEN_REPO_URI}/releases-ce'
+                // Create release branch
+                sh "git checkout -b ${releaseBranch}"
+                sh "git commit -a -m \"New release ${releaseVersion}\""
+                sh "git push https://${GITHUB_TOKEN}:x-oauth-basic@github.com/sip3io/logback-webhook-appender.git ${releaseBranch}"
             }
         }
     }
