@@ -16,6 +16,7 @@
 
 package io.sip3.logback
 
+import ch.qos.logback.classic.Level
 import ch.qos.logback.classic.spi.ILoggingEvent
 import ch.qos.logback.core.UnsynchronizedAppenderBase
 import ch.qos.logback.core.encoder.Encoder
@@ -40,20 +41,37 @@ class WebhookAppender : UnsynchronizedAppenderBase<ILoggingEvent>() {
     lateinit var url: String
     lateinit var json: String
 
+    var interval: Int by observable(60) { _, _, v ->
+        intervalInMillis = interval * 1000L
+    }
+    private var intervalInMillis = interval * 1000L
+
     var pattern: String by observable(".*") { _, _, v ->
         regex = Regex(v, RegexOption.DOT_MATCHES_ALL)
     }
     private var regex: Regex = Regex(pattern, RegexOption.DOT_MATCHES_ALL)
 
     private val client: OkHttpClient by lazy { OkHttpClient() }
+    private var lastSentAt = 0L
 
     override fun append(event: ILoggingEvent) {
+        // Threshold by ERROR level
+        if (event.level != Level.ERROR) {
+            return
+        }
+
+        // Limit send rate
+        if (event.timeStamp < lastSentAt + intervalInMillis) {
+            return
+        }
+
         // Encode message
         val message = String(encoder.encode(event))
 
         // Check if message matches configured pattern
         if (message.matches(regex)) {
             send(message)
+            lastSentAt = event.timeStamp
         }
     }
 

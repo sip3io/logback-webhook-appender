@@ -18,6 +18,7 @@ package io.sip3.logback
 
 import okhttp3.mockwebserver.MockWebServer
 import org.junit.After
+import org.junit.Assert.assertEquals
 import org.junit.Assert.assertNotNull
 import org.junit.Assert.assertTrue
 import org.junit.Before
@@ -41,16 +42,32 @@ class WebhookAppenderTest {
 
     @Test
     fun `Verify webhook call`() {
-        logger.info("Aloha, World!")
-        logger.info("Hello, %username%!")
-        logger.error("Hello, World:\n {\"name\": \"some string value in json\"}")
+        // INFO must be ignored
+        logger.info("Ignored 1")
 
-        val json = server.takeRequest(5, TimeUnit.SECONDS)
-                ?.body
-                ?.readString(Charset.defaultCharset())
+        // ERROR with json
+        repeat(2) {
+            // Ignored by pattern
+            logger.error("Bad news")
 
-        assertNotNull(json)
-        assertTrue(json!!.contains("\\\"some string value in json\\\""))
+            // Sent from webhook
+            logger.error("Hello, World:\n {\"name\": \"some string value in json\"}")
+
+            // Ignored by rate limit
+            logger.error("Hello, bad news!")
+
+            val json = server.takeRequest(5, TimeUnit.SECONDS)
+                    ?.body
+                    ?.readString(Charset.defaultCharset())
+
+            assertNotNull(json)
+            assertTrue(json!!.contains("\\\"some string value in json\\\""))
+
+            // Wait for cache expiring
+            Thread.sleep(1100L)
+        }
+
+        assertEquals(2, server.requestCount)
     }
 
     @After
