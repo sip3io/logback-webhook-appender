@@ -1,23 +1,20 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <configuration>
     <appender name="webhook" class="io.sip3.logback.WebhookAppender">
-        <filter class="io.sip3.logback.filters.ErrorRateLimitFilter">
-            <maxSize>100</maxSize>
-            <periodInMinutes>1</periodInMinutes>
-        </filter>
         <url>http://127.0.0.1:34343/webhook</url>
         <json>
             {
-                "message" : "{message}"
+            "message" : "{message}"
             }
         </json>
+        <interval>60</interval>
         <pattern>Hello.*</pattern>
         <encoder>
             <pattern>%msg</pattern>
         </encoder>
     </appender>
 
-    <root level="ERROR">
+    <root level="INFO">
         <appender-ref ref="webhook" />
     </root>
 </configuration>
