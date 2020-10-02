@@ -7,7 +7,7 @@
             "message" : "{message}"
             }
         </json>
-        <interval>60</interval>
+        <interval>1</interval>
         <pattern>Hello.*</pattern>
         <encoder>
             <pattern>%msg</pattern>
