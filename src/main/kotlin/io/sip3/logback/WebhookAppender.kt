@@ -81,9 +81,9 @@ class WebhookAppender : UnsynchronizedAppenderBase<ILoggingEvent>() {
 
         // Create HTTP POST request
         val request = Request.Builder()
-                .url(url)
-                .post(payload.toRequestBody("application/json; charset=utf-8".toMediaType()))
-                .build()
+            .url(url)
+            .post(payload.toRequestBody("application/json; charset=utf-8".toMediaType()))
+            .build()
 
         // Execute HTTP POST request
         client.newCall(request).enqueue(object : Callback {

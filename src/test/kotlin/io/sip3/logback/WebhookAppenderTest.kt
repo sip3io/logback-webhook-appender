@@ -18,9 +18,7 @@ package io.sip3.logback
 
 import okhttp3.mockwebserver.MockWebServer
 import org.junit.After
-import org.junit.Assert.assertEquals
-import org.junit.Assert.assertNotNull
-import org.junit.Assert.assertTrue
+import org.junit.Assert.*
 import org.junit.Before
 import org.junit.Test
 import org.slf4j.LoggerFactory
@@ -57,8 +55,8 @@ class WebhookAppenderTest {
             logger.error("Hello, bad news!")
 
             val json = server.takeRequest(5, TimeUnit.SECONDS)
-                    ?.body
-                    ?.readString(Charset.defaultCharset())
+                ?.body
+                ?.readString(Charset.defaultCharset())
 
             assertNotNull(json)
             assertTrue(json!!.contains("\\\"some string value in json\\\""))

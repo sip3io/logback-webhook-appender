@@ -15,6 +15,6 @@
     </appender>
 
     <root level="INFO">
-        <appender-ref ref="webhook" />
+        <appender-ref ref="webhook"/>
     </root>
 </configuration>
