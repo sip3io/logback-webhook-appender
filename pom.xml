@@ -12,7 +12,7 @@
         <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
         <kotlin.version>1.4.10</kotlin.version>
         <kotlin-logging.version>1.7.9</kotlin-logging.version>
-        <okhttp.version>4.9.0</okhttp.version>
+        <okhttp.version>4.9.1</okhttp.version>
         <commons-collections4.version>4.4</commons-collections4.version>
         <commons-text.version>1.9</commons-text.version>
         <logback.version>1.2.3</logback.version>
