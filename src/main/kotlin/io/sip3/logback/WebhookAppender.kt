@@ -41,7 +41,7 @@ class WebhookAppender : UnsynchronizedAppenderBase<ILoggingEvent>() {
     lateinit var url: String
     lateinit var json: String
 
-    var interval: Int by observable(60) { _, _, v ->
+    var interval: Int by observable(60) { _, _, _ ->
         intervalInMillis = interval * 1000L
     }
     private var intervalInMillis = interval * 1000L
