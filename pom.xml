@@ -7,7 +7,8 @@
     <artifactId>logback-webhook-appender</artifactId>
     <version>1.0.6-SNAPSHOT</version>
 
-    <properties><project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
+    <properties>
+        <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
         <java.version>11</java.version>
         <kotlin.version>1.7.21</kotlin.version>
         <okhttp.version>4.10.0</okhttp.version>
